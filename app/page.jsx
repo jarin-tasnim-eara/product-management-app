@@ -2,6 +2,7 @@ import { productService } from "@/services/productService";
 import ProductGrid from "@/components/product/ProductGrid";
 import ErrorState from "@/components/ui/ErrorState";
 import Hero from "@/components/layout/Hero";
+import ProductListing from "@/components/product/ProductListing";
 
 export default async function Home(){
   let products =[];
@@ -22,7 +23,7 @@ export default async function Home(){
       {error ? (
         <ErrorState message={error} />
       ) : (
-        <ProductGrid products={products} />
+        <ProductListing products={products} />
       )}
     </main>
     </>
