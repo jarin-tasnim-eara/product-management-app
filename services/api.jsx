@@ -10,14 +10,13 @@ async function request(endpoint, options = {}){
     throw new Error(`API Error: ${res.status} ${res.statusText}`);
   }
 
-  const text= await res.text();
-  return text ? JSON.parse(text) : null;
+return res.json();
 }
 
 export const api = {
   get:(endpoint)=> request(endpoint),
-  post:(endpoint, body)=>request(endpoint, {method: "POST", body: JSON.stringify(body)}),
-  put:(endpoint, body)=>request(endpoint, {method: "PUT", body: JSON.stringify(body)}),
-  patch:(endpoint, body)=>request(endpoint, {method: "PATCH", body: JSON.stringify(body)}),
+  post:(endpoint, data)=>request(endpoint, {method: "POST", body: JSON.stringify(data)}),
+  put:(endpoint, data)=>request(endpoint, {method: "PUT", body: JSON.stringify(data)}),
+  patch:(endpoint, data)=>request(endpoint, {method: "PATCH", body: JSON.stringify(data)}),
   delete:(endpoint)=> request(endpoint, {method: "DELETE"}),
 };

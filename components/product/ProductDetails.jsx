@@ -11,7 +11,7 @@ export default function ProductDetails({product}){
           {entries.map(([key, value]) => (
             <div key={key} className="border border-gray-100 rounded-lg p-3 bg-gray-50"
 >
-              <p className="text-xs text-gray-400 uppercase capitalize"> {key}</p>
+              <p className="text-xs text-gray-400  capitalize"> {key}</p>
               <p className="text-sm font-medium text-gray-800 mt-1">{String(value)} </p>
             </div>
           ))}
