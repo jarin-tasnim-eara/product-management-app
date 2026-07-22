@@ -12,16 +12,30 @@ export function useAuth() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const role = await authService.getRole(firebaseUser.uid);
-        dispatch(
-          setUser({
-            user: { uid: firebaseUser.uid, email: firebaseUser.email },
-            role,
-          })
-        );
-      } else {
-        dispatch(clearUser());
+      try {
+        if (firebaseUser) {
+          const role = await authService.getRole(firebaseUser.uid);
+          dispatch(
+            setUser({
+              user: { uid: firebaseUser.uid, email: firebaseUser.email },
+              role,
+            })
+          );
+        } else {
+          dispatch(clearUser());
+        }
+      } catch (error) {
+        console.warn("Auth state change error:", error);
+        if (firebaseUser) {
+          dispatch(
+            setUser({
+              user: { uid: firebaseUser.uid, email: firebaseUser.email },
+              role: "user",
+            })
+          );
+        } else {
+          dispatch(clearUser());
+        }
       }
     });
 

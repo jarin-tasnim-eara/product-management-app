@@ -47,24 +47,31 @@ const productSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
-        state.loading= true;
-        state.error= null;
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchProducts.fulfilled, (state,action) => {
-        state.loading= false;
-        state.items= action.payload;
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
       })
-      .addCase(fetchProducts.rejected, (state,action) => {
-        state.loading= false;
-        state.error= action.payload;
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
-      // Create
-      .addCase(createProduct.fulfilled, (state,action) => {
-        state.items.unshift(action.payload); 
+      .addCase(createProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      // Delete
-      .addCase(deleteProduct.fulfilled, (state,action) => {
-        state.items= state.items.filter((p) => p.id !== action.payload);
+      .addCase(createProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items.unshift(action.payload);
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.items = state.items.filter((p) => p.id !== action.payload);
       });
   },
 });
