@@ -2,58 +2,70 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { authService } from "@/services/authService";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState(null);
   const router = useRouter();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: { email: "", password: "" },
+  });
 
+  async function onSubmit(formValues) {
+    setServerError(null);
     try {
-      await authService.login(email, password);
-      router.push("/"); 
+      await authService.login(formValues.email, formValues.password);
+      router.push("/");
     } catch (err) {
-      setError("Invalid email or password.");
-    } finally {
-      setLoading(false);
+      setServerError("Invalid email or password.");
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="max-w-sm mx-auto space-y-4"
+    >
       <div>
         <label className="block text-sm font-medium mb-1">Email</label>
         <input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
+          {...register("email", { required: "Email is required" })}
           className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
         />
+        {errors.email && (
+          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+        )}
       </div>
 
       <div>
         <label className="block text-sm font-medium mb-1">Password</label>
         <input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+          {...register("password", { required: "Password is required" })}
           className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
         />
+        {errors.password && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.password.message}
+          </p>
+        )}
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {serverError && <p className="text-red-500 text-sm">{serverError}</p>}
 
-      <button type="submit" disabled={loading} className="w-full bg-gray-900 text-white py-2 rounded-md text-sm hover:bg-gray-700 disabled:opacity-50">
-        {loading ? "Logging in..." : "Login"}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full bg-gray-900 text-white py-2 rounded-md text-sm hover:bg-gray-700 disabled:opacity-50"
+      >
+        {isSubmitting ? "Logging in..." : "Login"}
       </button>
     </form>
   );
