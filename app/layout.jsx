@@ -1,5 +1,4 @@
-// import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import ReduxProvider from "@/redux/ReduxProvider";
@@ -14,25 +13,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata= {
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+export const metadata = {
   title: "ProductHub",
   description: "Modern Product Listing Platform",
 };
 
-export default function RootLayout({
-  children
-}){
+export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-[#F4F0E4] text-[#1B2430]">
         <ReduxProvider>
-        <Header />
-        {children}
+          <Header />
+          {children}
         </ReduxProvider>
-        </body>
+      </body>
     </html>
   );
 }

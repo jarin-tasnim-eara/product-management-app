@@ -3,15 +3,18 @@
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 
-function AuthListener({ children }) {
-  useAuth(); 
+function AppListeners({ children }) {
+  useAuth();
+  useCart();
   return children;
 }
+
 export default function ReduxProvider({ children }) {
-  return <Provider store={store}>
-    <AuthListener>
-    {children}
-    </AuthListener>
-    </Provider>;
+  return (
+    <Provider store={store}>
+      <AppListeners>{children}</AppListeners>
+    </Provider>
+  );
 }

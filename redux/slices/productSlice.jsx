@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { productService } from "@/services/productService";
 
-
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
   async (_, { rejectWithValue }) => {
@@ -24,13 +23,24 @@ export const createProduct = createAsyncThunk(
   }
 );
 
+export const updateProduct = createAsyncThunk(
+  "products/update",
+  async ({ id, productData }, { rejectWithValue }) => {
+    try {
+      return await productService.update(id, productData);
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 export const deleteProduct = createAsyncThunk(
   "products/delete",
-  async (id, {rejectWithValue})=>{
-    try{
+  async (id, { rejectWithValue }) => {
+    try {
       await productService.delete(id);
-      return id; 
-    }catch (err) {
+      return id;
+    } catch (err) {
       return rejectWithValue(err.message);
     }
   }
@@ -38,12 +48,12 @@ export const deleteProduct = createAsyncThunk(
 
 const productSlice = createSlice({
   name: "products",
-  initialState:{
-    items:[],
+  initialState: {
+    items: [],
     loading: false,
     error: null,
   },
-  reducers: {}, 
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
@@ -69,6 +79,10 @@ const productSlice = createSlice({
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        const index = state.items.findIndex((p) => p.id === action.payload.id);
+        if (index !== -1) state.items[index] = action.payload;
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.items = state.items.filter((p) => p.id !== action.payload);
