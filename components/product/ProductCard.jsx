@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { FaStar, FaPen, FaTrash, FaCartPlus } from "react-icons/fa";
 import { addItem } from "@/redux/slices/cartSlice";
+import { formatBDT } from "@/lib/formatPrice";
 
 export default function ProductCard({ product, showOwnerActions = false, onDelete }) {
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
         <div className="flex items-center justify-between mt-2">
           {price != null && (
             <span className="text-sm font-semibold text-[#1B2430]">
-              ${price}
+              {formatBDT(price)}
             </span>
           )}
           {rating != null && (
@@ -107,7 +108,7 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
         )}
         <Link
           href={`/products/${id}`}
-          className={`text-center px-3 py-2 border bg-[#393748] border-[#1B2430]/20 text-[#d9e2ed] rounded-md text-sm hover:border-[#6E7A52] hover:text-[#6E7A52] transition-colors ${
+          className={`text-center bg-[#393748] px-3 py-2 border border-[#1B2430]/20 text-white rounded-md text-sm hover:border-[#6E7A52] hover:text-[#6E7A52] transition-colors ${
             showOwnerActions ? "w-full" : "flex-1"
           }`}
         >

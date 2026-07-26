@@ -4,4 +4,4 @@ export const ROLES = {
   SELLER: "seller",
   ADMIN: "admin",
 };
-
+export const USD_TO_BDT = 122;

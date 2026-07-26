@@ -22,6 +22,7 @@ const cartSlice = createSlice({
           name: product.name,
           price: product.data?.price ?? 0,
           image: product.data?.image ?? null,
+          sellerEmail: product.data?.sellerEmail ?? null, // Order এ কার কাছ থেকে কেনা হলো তা ট্র্যাক করতে লাগবে
           quantity: 1,
         });
       }

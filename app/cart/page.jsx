@@ -1,16 +1,33 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItem, updateQuantity, clearCart } from "@/redux/slices/cartSlice";
+import { orderService } from "@/services/orderService";
+import { formatBDT } from "@/lib/formatPrice";
 import { FaTrash } from "react-icons/fa";
 
 export default function CartPage() {
   const dispatch = useDispatch();
   const { items } = useSelector((state) => state.cart);
   const { user, initialized } = useSelector((state) => state.auth);
+  const [placing, setPlacing] = useState(false);
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  async function handleCheckout() {
+    setPlacing(true);
+    try {
+      await orderService.createOrder(user.email, items, total);
+      alert("Order placed successfully!");
+      dispatch(clearCart());
+    } catch (err) {
+      alert("Could not place order. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
+  }
 
   if (initialized && !user) {
     return (
@@ -61,7 +78,7 @@ export default function CartPage() {
 
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#1B2430] truncate">{item.name}</p>
-              <p className="text-sm text-[#1B2430]/50">${item.price} each</p>
+              <p className="text-sm text-[#1B2430]/50">{formatBDT(item.price)} each</p>
             </div>
 
             <input
@@ -80,7 +97,7 @@ export default function CartPage() {
             />
 
             <span className="text-sm font-semibold text-[#1B2430] w-20 text-right">
-              ${(item.price * item.quantity).toFixed(2)}
+              {formatBDT(item.price * item.quantity)}
             </span>
 
             <button
@@ -96,16 +113,14 @@ export default function CartPage() {
 
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#1B2430]/10">
         <span className="text-lg font-semibold text-[#1B2430]">
-          Total: ${total.toFixed(2)}
+          Total: {formatBDT(total)}
         </span>
         <button
-          onClick={() => {
-            alert("Order placed! (Demo checkout — no real payment integration yet.)");
-            dispatch(clearCart());
-          }}
-          className="px-6 py-2.5 bg-[#6E7A52] text-white rounded-md text-sm font-medium hover:bg-[#5a6443] transition-colors"
+          onClick={handleCheckout}
+          disabled={placing}
+          className="px-6 py-2.5 bg-[#6E7A52] text-white rounded-md text-sm font-medium hover:bg-[#5a6443] transition-colors disabled:opacity-50"
         >
-          Checkout
+          {placing ? "Placing order..." : "Checkout"}
         </button>
       </div>
     </main>

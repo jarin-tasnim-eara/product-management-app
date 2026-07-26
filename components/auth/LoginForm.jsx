@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { authService } from "@/services/authService";
+import { ROLES } from "@/config/constants";
 
 export default function LoginForm() {
   const [serverError, setServerError] = useState(null);
@@ -23,8 +24,15 @@ export default function LoginForm() {
   async function onSubmit(formValues) {
     setServerError(null);
     try {
-      await authService.login(formValues.email, formValues.password);
-      router.push(next === "cart" ? "/cart" : "/");
+      const loggedInUser = await authService.login(formValues.email, formValues.password);
+
+      if (next === "cart") {
+        router.push("/cart");
+      } else if (loggedInUser.role === ROLES.SELLER || loggedInUser.role === ROLES.ADMIN) {
+        router.push("/seller/dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       setServerError("Invalid email or password.");
     }

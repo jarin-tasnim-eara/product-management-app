@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { db } from "@/lib/firebase";
+import { USD_TO_BDT } from "@/config/constants";
 import {
   collection,
   addDoc,
@@ -20,7 +21,7 @@ function mapDummyProduct(p) {
     name: p.title,
     data: {
       category: p.category,
-      price: p.price,
+      price: Math.round(p.price * USD_TO_BDT),
       brand: p.brand,
       rating: p.rating,
       image: p.thumbnail,

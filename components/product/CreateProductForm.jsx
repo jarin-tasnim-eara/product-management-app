@@ -24,6 +24,7 @@ export default function CreateProductForm() {
       brand: "",
       image: "",
       rating: "",
+      stock: "",
       description: "",
     },
   });
@@ -39,13 +40,14 @@ export default function CreateProductForm() {
           brand: formValues.brand,
           image: formValues.image || null,
           rating: formValues.rating ? parseFloat(formValues.rating) : null,
+          stock: formValues.stock ? parseInt(formValues.stock) : 0,
           description: formValues.description || "",
           sellerEmail: user?.email || "unknown",
         },
       };
 
       await dispatch(createProduct(productData)).unwrap();
-      router.push("/");
+      router.push("/seller/products");
     } catch (err) {
       setServerError(err.message || "Failed to create product");
     }
@@ -61,7 +63,7 @@ export default function CreateProductForm() {
         <input
           type="text"
           {...register("name", { required: "Product name is required" })}
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
         {errors.name && (
           <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
@@ -74,7 +76,7 @@ export default function CreateProductForm() {
           type="text"
           {...register("category", { required: "Category is required" })}
           placeholder="e.g. Electronics, Fashion, Home"
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
         {errors.category && (
           <p className="text-red-500 text-xs mt-1">
@@ -84,7 +86,7 @@ export default function CreateProductForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Price ($)</label>
+        <label className="block text-sm font-medium mb-1">Price (৳ BDT)</label>
         <input
           type="number"
           step="0.01"
@@ -92,10 +94,28 @@ export default function CreateProductForm() {
             required: "Price is required",
             min: { value: 0, message: "Price can't be negative" },
           })}
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
         {errors.price && (
           <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>
+        )}
+        
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Stock Quantity</label>
+        <input
+          type="number"
+          min="0"
+          {...register("stock", {
+            required: "Stock quantity is required",
+            min: { value: 0, message: "Stock can't be negative" },
+          })}
+          placeholder="e.g. 50"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
+        />
+        {errors.stock && (
+          <p className="text-red-500 text-xs mt-1">{errors.stock.message}</p>
         )}
       </div>
 
@@ -105,14 +125,12 @@ export default function CreateProductForm() {
           type="text"
           {...register("brand")}
           placeholder="e.g. Apple, Nike, Samsung"
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">
-          Image URL
-        </label>
+        <label className="block text-sm font-medium mb-1">Image URL</label>
         <input
           type="url"
           {...register("image", {
@@ -122,15 +140,11 @@ export default function CreateProductForm() {
             },
           })}
           placeholder="https://example.com/image.jpg"
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
         {errors.image && (
           <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>
         )}
-        <p className="text-xs text-gray-400 mt-1">
-          Paste a direct image link (e.g. from Imgur, Unsplash, or your own
-          hosting).
-        </p>
       </div>
 
       <div>
@@ -146,7 +160,7 @@ export default function CreateProductForm() {
             min: { value: 0, message: "Rating must be between 0 and 5" },
             max: { value: 5, message: "Rating must be between 0 and 5" },
           })}
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
         {errors.rating && (
           <p className="text-red-500 text-xs mt-1">{errors.rating.message}</p>
@@ -160,7 +174,7 @@ export default function CreateProductForm() {
         <textarea
           {...register("description")}
           rows={3}
-          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-gray-500"
+          className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
         />
       </div>
 
@@ -173,7 +187,7 @@ export default function CreateProductForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-gray-900 text-white py-2 rounded-md text-sm hover:bg-gray-700 disabled:opacity-50"
+        className="w-full bg-[#1B2430] text-white py-2 rounded-md text-sm hover:bg-[#6E7A52] transition-colors disabled:opacity-50"
       >
         {isSubmitting ? "Creating..." : "Create Product"}
       </button>

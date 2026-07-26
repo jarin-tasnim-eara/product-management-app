@@ -14,11 +14,15 @@ export function useAuth() {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
-          const role = await authService.getRole(firebaseUser.uid);
+          const profile = await authService.getUserProfile(firebaseUser.uid);
           dispatch(
             setUser({
-              user: { uid: firebaseUser.uid, email: firebaseUser.email },
-              role,
+              user: {
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                name: profile.name,
+              },
+              role: profile.role,
             })
           );
         } else {
@@ -29,7 +33,7 @@ export function useAuth() {
         if (firebaseUser) {
           dispatch(
             setUser({
-              user: { uid: firebaseUser.uid, email: firebaseUser.email },
+              user: { uid: firebaseUser.uid, email: firebaseUser.email, name: "" },
               role: "user",
             })
           );

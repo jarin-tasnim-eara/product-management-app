@@ -18,18 +18,26 @@ export default function SignupForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: { email: "", password: "", role: ROLES.USER },
+    defaultValues: { name: "", email: "", password: "", role: ROLES.USER },
   });
 
   async function onSubmit(formValues) {
     setServerError(null);
     try {
-      await authService.signup(
+      const newUser = await authService.signup(
         formValues.email,
         formValues.password,
-        formValues.role
+        formValues.role,
+        formValues.name
       );
-      router.push(next === "cart" ? "/cart" : "/");
+
+      if (next === "cart") {
+        router.push("/cart");
+      } else if (newUser.role === ROLES.SELLER || newUser.role === ROLES.ADMIN) {
+        router.push("/seller/dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       setServerError("Could not create account. Try a different email.");
     }
@@ -44,6 +52,18 @@ export default function SignupForm() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Full Name</label>
+          <input
+            type="text"
+            {...register("name", { required: "Name is required" })}
+            className="w-full border rounded-md px-3 py-2 text-sm outline-none focus:border-[#6E7A52]"
+          />
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+          )}
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-1">Email</label>
           <input

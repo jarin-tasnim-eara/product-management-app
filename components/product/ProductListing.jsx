@@ -36,10 +36,10 @@ export default function ProductListing({ products }) {
   }, [products, sellerProducts, isSellerView]);
 
   const searchFiltered = useMemo(() => {
+    const query = search.trim().replace(/\s+/g, " ").toLowerCase();
     if (!search) return allProducts;
     return allProducts.filter((p) =>
-      p.name?.toLowerCase().includes(search.toLowerCase())
-    );
+p.name?.toLowerCase().includes(query)    );
   }, [allProducts, search]);
 
   const filteredProducts = useMemo(() => {

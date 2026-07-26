@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import { usePathname } from "next/navigation";
 import { authService } from "@/services/authService";
 import { ROLES } from "@/config/constants";
 import { useRouter } from "next/navigation";
@@ -8,10 +9,30 @@ import { FaShoppingCart } from "react-icons/fa";
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, role, initialized } = useSelector((state) => state.auth);
   const cartCount = useSelector((state) =>
     state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
   );
+
+  const isDashboardArea =
+    pathname?.startsWith("/seller") || pathname?.startsWith("/account");
+
+
+  if (isDashboardArea) {
+    return (
+      <header className="sticky top-0 z-50 bg-[#1B2430]">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold text-white">
+            ProductHub
+          </Link>
+          {user && (
+            <span className="text-sm text-white/60">{user.email}</span>
+          )}
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-[#1B2430]">
@@ -20,28 +41,39 @@ export default function Header() {
           ProductHub
         </Link>
 
+        <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
+          <Link href="/" className="hover:text-white transition-colors">
+            Home
+          </Link>
+          <Link href="/about" className="hover:text-white transition-colors">
+            About Us
+          </Link>
+          <Link href="/contact" className="hover:text-white transition-colors">
+            Contact
+          </Link>
+        </nav>
+
         <div className="flex items-center gap-3 shrink-0">
           {!initialized ? (
             <span className="text-sm text-white/50">Loading...</span>
           ) : user ? (
             <>
-              <span className="text-sm text-white/70 capitalize hidden sm:inline">
-                {user.email} ({role})
-              </span>
-
-              {role === ROLES.SELLER && (
-                <span className="text-xs bg-white/10 text-white px-2 py-0.5 rounded-full font-medium">
-                  My Products
-                </span>
+              {role === ROLES.USER && (
+                <Link
+                  href="/account/profile"
+                  className="text-sm  text-white/70 hover:text-white transition-colors hidden sm:inline"
+                >
+                 Look at your Dashboard, {user.name || user.email.split("@")[0]}
+                </Link>
               )}
 
               {(role === ROLES.SELLER || role === ROLES.ADMIN) && (
-                <button
-                  onClick={() => router.push("/products/create")}
+                <Link
+                  href="/seller/dashboard"
                   className="text-sm bg-[#6E7A52] text-white px-3 py-1.5 rounded-md hover:bg-[#5a6443] transition-colors"
                 >
-                  + Add
-                </button>
+                  Seller Dashboard
+                </Link>
               )}
 
               <Link
@@ -67,7 +99,7 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="text-sm bg-[#b276a7] text-white px-3 py-1.5 rounded-md hover:bg-white/20 transition-colors"
+                className="text-sm bg-white/10 text-white px-3 py-1.5 rounded-md hover:bg-white/20 transition-colors"
               >
                 Login
               </Link>

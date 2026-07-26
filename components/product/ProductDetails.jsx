@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { FaStar, FaCartPlus, FaStore } from "react-icons/fa";
 import { addItem } from "@/redux/slices/cartSlice";
+import { formatBDT } from "@/lib/formatPrice";
 
 export default function ProductDetails({ product }) {
   const dispatch = useDispatch();
@@ -64,7 +65,7 @@ export default function ProductDetails({ product }) {
           <div className="flex items-center gap-4 mb-4">
             {price != null && (
               <span className="text-xl font-semibold text-[#1B2430]">
-                ${price}
+                {formatBDT(price)}
               </span>
             )}
             {rating != null && (
