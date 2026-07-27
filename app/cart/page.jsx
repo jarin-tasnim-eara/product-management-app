@@ -6,10 +6,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeItem, updateQuantity, clearCart } from "@/redux/slices/cartSlice";
 import { orderService } from "@/services/orderService";
 import { formatBDT } from "@/lib/formatPrice";
-import { FaTrash } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { FaTrash, FaArrowLeft } from "react-icons/fa";
 
 export default function CartPage() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { items } = useSelector((state) => state.cart);
   const { user, initialized } = useSelector((state) => state.auth);
   const [placing, setPlacing] = useState(false);
@@ -59,6 +61,13 @@ export default function CartPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-sm text-[#1B2430]/60 hover:text-[#1B2430] mb-6 transition-colors"
+      >
+        <FaArrowLeft size={12} />
+        Back
+      </button>
       <h1 className="text-2xl font-bold text-[#1B2430] mb-8">Your Cart</h1>
 
       <div className="space-y-4">
@@ -69,7 +78,6 @@ export default function CartPage() {
           >
             <div className="w-16 h-16 rounded-lg bg-[#F4F0E4] overflow-hidden shrink-0 flex items-center justify-center">
               {item.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-[10px] text-[#1B2430]/25">No image</span>
@@ -93,7 +101,7 @@ export default function CartPage() {
                   })
                 )
               }
-              className="w-16 border border-[#1B2430]/15 rounded-md px-2 py-1 text-sm text-center focus:outline-none focus:border-[#6E7A52]"
+              className="w-16 border border-[#1B2430]/15 rounded-md px-2 py-1 text-sm text-center focus:outline-none focus:border-[#7a5b52]"
             />
 
             <span className="text-sm font-semibold text-[#1B2430] w-20 text-right">

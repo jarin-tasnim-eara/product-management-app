@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { orderService } from "@/services/orderService";
 import { formatBDT } from "@/lib/formatPrice";
+import { FaReceipt } from "react-icons/fa";
+
+function formatDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
 
 export default function MyOrdersPage() {
   const { user } = useSelector((state) => state.auth);
@@ -22,7 +29,10 @@ export default function MyOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#1B2430] mb-6">My Orders</h1>
+      <h1 className="text-2xl font-bold text-[#1B2430] mb-6 flex items-center gap-2">
+        <FaReceipt className="text-[#6E7A52]" />
+        My Orders
+      </h1>
 
       {orders.length === 0 ? (
         <p className="text-[#1B2430]/50">You haven't placed any orders yet.</p>
@@ -33,42 +43,41 @@ export default function MyOrdersPage() {
               key={order.id}
               className="bg-white rounded-xl border border-[#1B2430]/10 overflow-hidden"
             >
-              <div className="flex  items-center justify-between px-5 py-3 bg-[#F4F0E4] border-b border-[#1B2430]/10">
-                <div>
-                  <p className="text-xs text-[#1B2430]/50">Order placed</p>
-                  <p className="text-sm font-medium text-[#1B2430]">
-                    {order.createdAt?.slice(0, 10)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-[#1B2430]/50">Order Total</p>
-                  <p className="text-sm font-semibold text-[#6E7A52]">
-                    {formatBDT(order.total)}
-                  </p>
-                </div>
+              <div className="flex items-center justify-between px-4 sm:px-5 py-3 bg-[#F4F0E4] border-b border-[#1B2430]/10 gap-2">
+                <p className="text-xs sm:text-sm text-[#1B2430]/60">
+                  {formatDate(order.createdAt)}
+                </p>
+                <span className="text-xs sm:text-sm font-semibold text-white bg-[#6E7A52] px-3 py-1 rounded-full shrink-0">
+                  {formatBDT(order.total)}
+                </span>
               </div>
 
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm table-fixed">
                 <thead>
-                  <tr className="text-left text-[#1B2430]/40 text-xs uppercase tracking-wide">
-                    <th className="px-5 py-2">Product</th>
-                    <th className="px-5 py-2 text-center">Qty</th>
-                    <th className="px-5 py-2 text-right">Price</th>
-                    <th className="px-5 py-2 text-right">Subtotal</th>
+                  <tr className="bg-[#94AC8D]/15 text-[#1B2430]/60 text-left">
+                    <th className="px-3 sm:px-5 py-2 font-medium w-[46%]">Product</th>
+                    <th className="px-2 py-2 font-medium text-center w-[16%]">Qty</th>
+                    <th className="px-2 py-2 font-medium text-right w-[38%] pr-3 sm:pr-5">
+                      Subtotal
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {(order.items || []).map((it, i) => (
-                    <tr key={i} className="border-t border-[#1B2430]/5">
-                      <td className="px-5 py-3 text-[#1B2430]">{it.name}</td>
-                      <td className="px-5 py-3 text-center text-[#1B2430]/70">
+                    <tr
+                      key={i}
+                      className={`border-t border-[#1B2430]/5 ${
+                        i % 2 === 1 ? "bg-[#F4F0E4]/40" : ""
+                      }`}
+                    >
+                      <td className="px-3 sm:px-5 py-2 text-[#1B2430] break-words">
+                        {it.name}
+                      </td>
+                      <td className="px-2 py-2 text-[#1B2430]/60 text-center">
                         {it.quantity}
                       </td>
-                      <td className="px-5 py-3 text-right text-[#1B2430]/70">
-                        {formatBDT(it.price)}
-                      </td>
-                      <td className="px-5 py-3 text-right font-medium text-[#1B2430]">
-                        {formatBDT(it.price * it.quantity)}
+                      <td className="px-2 py-2 text-[#6E7A52] font-semibold text-right pr-3 sm:pr-5">
+                        {formatBDT(it.price * it.quantity, it.currency)}
                       </td>
                     </tr>
                   ))}

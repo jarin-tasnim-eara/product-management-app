@@ -18,15 +18,13 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const PIE_COLORS = ["#4931b2", "#FFC0CB", "#7c1282", "#6fc92b", "#1a447b"];
+const PIE_COLORS = ["#6E7A52", "#94AC8D", "#B5573F", "#C9962B", "#1B2430"];
 
 function stockColor(stock) {
-  if (stock < 10) return "#e3451e";
-   if (stock < 20) return "#7a3379";
-  if (stock < 30) return "#70d428";
-    if (stock < 40) return "#3628d4";
- if (stock < 50) return "#d52d65";
-  return "#54bdc1";
+  if (stock < 10) return "#B5573F";
+  if (stock < 30) return "#C9962B";
+  
+  return "#6E7A52";
 }
 
 export default function SellerDashboardPage() {
@@ -134,7 +132,7 @@ export default function SellerDashboardPage() {
                 formatter={(v) => formatBDT(v)}
                 contentStyle={{ borderRadius: 8, border: "1px solid #1B243020" }}
               />
-              <Bar dataKey="sales" fill="#FFC0CB" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="sales" fill="#6E7A52" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -174,7 +172,7 @@ export default function SellerDashboardPage() {
           <span className="inline-block w-2 h-2 rounded-full bg-[#C9962B] mr-2" />
           Stock Levels
         </p>
-        
+       
         {stockData.length === 0 ? (
           <p className="text-sm text-[#1B2430]/40">No products yet.</p>
         ) : (

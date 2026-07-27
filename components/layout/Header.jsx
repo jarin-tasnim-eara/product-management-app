@@ -1,23 +1,62 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { usePathname } from "next/navigation";
 import { authService } from "@/services/authService";
 import { ROLES } from "@/config/constants";
-import { useRouter } from "next/navigation";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaBars } from "react-icons/fa";
 
 export default function Header() {
-  const router = useRouter();
   const pathname = usePathname();
   const { user, role, initialized } = useSelector((state) => state.auth);
   const cartCount = useSelector((state) =>
     state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
   );
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isDashboardArea =
     pathname?.startsWith("/seller") || pathname?.startsWith("/account");
 
+ 
+  function AccountMenu({ dashboardHref, dashboardLabel }) {
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setMenuOpen((v) => !v)}
+          className="text-white/80 hover:text-white p-2 rounded-md hover:bg-white/10 transition-colors"
+        >
+          <FaBars size={18} />
+        </button>
+        {menuOpen && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-[#1B2430]/10 py-1 z-50">
+              <p className="px-4 py-2 text-xs text-[#1B2430]/40 truncate border-b border-[#1B2430]/5">
+                {user?.email}
+              </p>
+              <Link
+                href={dashboardHref}
+                onClick={() => setMenuOpen(false)}
+                className="block px-4 py-2 text-sm text-[#1B2430] hover:bg-[#F4F0E4] transition-colors"
+              >
+                {dashboardLabel}
+              </Link>
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  authService.logout();
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-[#B5573F] hover:bg-[#F4F0E4] transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
 
   if (isDashboardArea) {
     return (
@@ -26,9 +65,26 @@ export default function Header() {
           <Link href="/" className="text-xl font-bold text-white">
             ProductHub
           </Link>
-          {user && (
-            <span className="text-sm text-white/60">{user.email}</span>
-          )}
+          <div className="flex items-center gap-4">
+            {user && role === ROLES.USER && (
+              <Link
+                href="/cart"
+                className="relative text-white/80 hover:text-white transition-colors p-1.5"
+              >
+                <FaShoppingCart size={18} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#6E7A52] text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            {user && (
+              <span className="text-sm text-white/60 hidden sm:inline">
+                {user.email}
+              </span>
+            )}
+          </div>
         </div>
       </header>
     );
@@ -36,7 +92,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-[#1B2430]">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
         <Link href="/" className="text-xl font-bold text-white shrink-0">
           ProductHub
         </Link>
@@ -53,53 +109,33 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {!initialized ? (
             <span className="text-sm text-white/50">Loading...</span>
           ) : user ? (
-            <>
-              {role === ROLES.USER && (
+            role === ROLES.SELLER || role === ROLES.ADMIN ? (
+              <AccountMenu dashboardHref="/seller/dashboard" dashboardLabel="Seller Dashboard" />
+            ) : (
+              <>
                 <Link
-                  href="/account/profile"
-                  className="text-sm  text-white/70 hover:text-white transition-colors hidden sm:inline"
+                  href="/cart"
+                  className="relative text-white/80 hover:text-white transition-colors p-1.5"
                 >
-                 Look at your Dashboard, {user.name || user.email.split("@")[0]}
+                  <FaShoppingCart size={18} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#6E7A52] text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
-              )}
-
-              {(role === ROLES.SELLER || role === ROLES.ADMIN) && (
-                <Link
-                  href="/seller/dashboard"
-                  className="text-sm bg-[#6E7A52] text-white px-3 py-1.5 rounded-md hover:bg-[#5a6443] transition-colors"
-                >
-                  Seller Dashboard
-                </Link>
-              )}
-
-              <Link
-                href="/cart"
-                className="relative text-white/80 hover:text-white transition-colors p-1.5"
-              >
-                <FaShoppingCart size={18} />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#6E7A52] text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-
-              <button
-                onClick={() => authService.logout()}
-                className="text-sm bg-[#B5573F] text-white px-3 py-1.5 rounded-md hover:bg-[#9c4a35] transition-colors"
-              >
-                Logout
-              </button>
-            </>
+                <AccountMenu dashboardHref="/account/orders" dashboardLabel="My Dashboard" />
+              </>
+            )
           ) : (
             <>
               <Link
                 href="/login"
-                className="text-sm bg-white/10 text-white px-3 py-1.5 rounded-md hover:bg-white/20 transition-colors"
+                className="text-sm bg-[#b276a7] text-white px-3 py-1.5 rounded-md hover:bg-[#9c5f8f] transition-colors"
               >
                 Login
               </Link>

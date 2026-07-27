@@ -13,11 +13,11 @@ export default function ContactPage() {
         </p>
         <div className="flex items-center gap-3 text-sm text-[#1B2430]/70">
           <FaEnvelope className="text-[#6E7A52]" />
-          support@producthub.example
+          support@producthub.com
         </div>
         <div className="flex items-center gap-3 text-sm text-[#1B2430]/70">
           <FaPhone className="text-[#6E7A52]" />
-          +880 1XXX-XXXXXX
+          +880 1611744381
         </div>
       </div>
     </main>

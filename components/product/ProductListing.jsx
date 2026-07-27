@@ -37,9 +37,15 @@ export default function ProductListing({ products }) {
 
   const searchFiltered = useMemo(() => {
     const query = search.trim().replace(/\s+/g, " ").toLowerCase();
-    if (!search) return allProducts;
-    return allProducts.filter((p) =>
-p.name?.toLowerCase().includes(query)    );
+    if (!query) return allProducts;
+
+  
+    const words = query.split(" ").filter(Boolean);
+
+    return allProducts.filter((p) => {
+      const nameLower = p.name?.toLowerCase() || "";
+      return words.every((word) => nameLower.includes(word));
+    });
   }, [allProducts, search]);
 
   const filteredProducts = useMemo(() => {

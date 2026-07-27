@@ -9,7 +9,7 @@ export default function SellerLayout({ children }) {
     <ProtectedRoute allowedRoles={[ROLES.SELLER, ROLES.ADMIN]}>
       <div className="flex min-h-[calc(100vh-73px)]">
         <SellerSidebar />
-        <div className="flex-1 bg-[#F4F0E4] p-8">{children}</div>
+        <div className="flex-1 bg-[#F4F0E4] p-6 pt-20 md:p-8">{children}</div>
       </div>
     </ProtectedRoute>
   );
