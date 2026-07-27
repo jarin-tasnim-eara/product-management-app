@@ -11,6 +11,7 @@ import {
   deleteDoc,
   query,
   where,
+  increment,
 } from "firebase/firestore";
 
 const PRODUCTS_COLLECTION = "products";
@@ -120,5 +121,13 @@ export const productService = {
   async delete(id) {
     await deleteDoc(doc(db, PRODUCTS_COLLECTION, id));
     return { success: true };
+  },
+
+  
+  async decrementStock(id, quantity) {
+    
+    await updateDoc(doc(db, PRODUCTS_COLLECTION, id), {
+      "data.stock": increment(-quantity),
+    });
   },
 };

@@ -9,6 +9,7 @@ import Pagination from "./Pagination";
 import CreateProductButton from "./CreateProductButton";
 import { productService } from "@/services/productService";
 import { deleteProduct } from "@/redux/slices/productSlice";
+import { showError, confirmAction } from "@/lib/alerts";
 
 const PAGE_SIZE = 8;
 
@@ -39,7 +40,6 @@ export default function ProductListing({ products }) {
     const query = search.trim().replace(/\s+/g, " ").toLowerCase();
     if (!query) return allProducts;
 
-  
     const words = query.split(" ").filter(Boolean);
 
     return allProducts.filter((p) => {
@@ -79,14 +79,14 @@ export default function ProductListing({ products }) {
   }
 
   async function handleDelete(id) {
-    const confirmed = window.confirm("Delete this product? This can't be undone.");
+    const confirmed = await confirmAction("Delete this product? This can't be undone.");
     if (!confirmed) return;
 
     try {
       await dispatch(deleteProduct(id)).unwrap();
       setSellerProducts((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
-      alert("Could not delete product. Please try again.");
+      showError("Could not delete product. Please try again.");
     }
   }
 

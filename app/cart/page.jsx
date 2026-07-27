@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItem, updateQuantity, clearCart } from "@/redux/slices/cartSlice";
 import { orderService } from "@/services/orderService";
+import { showSuccess, showError } from "@/lib/alerts";
 import { formatBDT } from "@/lib/formatPrice";
 import { useRouter } from "next/navigation";
 import { FaTrash, FaArrowLeft } from "react-icons/fa";
@@ -22,10 +23,10 @@ export default function CartPage() {
     setPlacing(true);
     try {
       await orderService.createOrder(user.email, items, total);
-      alert("Order placed successfully!");
+      await showSuccess("Order placed successfully!");
       dispatch(clearCart());
     } catch (err) {
-      alert("Could not place order. Please try again.");
+      showError("Could not place order. Please try again.");
     } finally {
       setPlacing(false);
     }
@@ -101,7 +102,7 @@ export default function CartPage() {
                   })
                 )
               }
-              className="w-16 border border-[#1B2430]/15 rounded-md px-2 py-1 text-sm text-center focus:outline-none focus:border-[#7a5b52]"
+              className="w-16 border border-[#1B2430]/15 rounded-md px-2 py-1 text-sm text-center focus:outline-none focus:border-[#6E7A52]"
             />
 
             <span className="text-sm font-semibold text-[#1B2430] w-20 text-right">

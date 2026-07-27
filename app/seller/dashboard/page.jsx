@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { orderService } from "@/services/orderService";
 import { productService } from "@/services/productService";
 import { formatBDT } from "@/lib/formatPrice";
+import { showError } from "@/lib/alerts";
 import {
   BarChart,
   Bar,
@@ -20,10 +21,16 @@ import {
 
 const PIE_COLORS = ["#6E7A52", "#94AC8D", "#B5573F", "#C9962B", "#1B2430"];
 
+const STATUS_OPTIONS = ["pending", "shipped", "delivered"];
+const STATUS_STYLES = {
+  pending: "bg-[#C9962B]/15 text-[#C9962B]",
+  shipped: "bg-[#3B6EA5]/15 text-[#3B6EA5]",
+  delivered: "bg-[#6E7A52]/15 text-[#6E7A52]",
+};
+
 function stockColor(stock) {
   if (stock < 10) return "#B5573F";
   if (stock < 30) return "#C9962B";
-  
   return "#6E7A52";
 }
 
@@ -52,8 +59,19 @@ export default function SellerDashboardPage() {
   const myItems = orders.flatMap((o) =>
     (o.items || [])
       .filter((it) => it.sellerEmail === user.email)
-      .map((it) => ({ ...it, orderId: o.id, createdAt: o.createdAt }))
+      .map((it) => ({ ...it, orderId: o.id, createdAt: o.createdAt, status: o.status || "pending" }))
   );
+
+  async function handleStatusChange(orderId, newStatus) {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    );
+    try {
+      await orderService.updateOrderStatus(orderId, newStatus);
+    } catch (err) {
+      showError("Could not update status. Please try again.");
+    }
+  }
 
   const totalSales = myItems.reduce((sum, it) => sum + it.price * it.quantity, 0);
   const totalOrders = new Set(myItems.map((it) => it.orderId)).size;
@@ -203,7 +221,8 @@ export default function SellerDashboardPage() {
                 <th className="px-3 py-2 bg-[#1B2430] rounded-l-md">Product</th>
                 <th className="px-3 py-2 bg-[#1B2430]">Qty</th>
                 <th className="px-3 py-2 bg-[#1B2430]">Total</th>
-                <th className="px-3 py-2 bg-[#1B2430] rounded-r-md">Date</th>
+                <th className="px-3 py-2 bg-[#1B2430]">Date</th>
+                <th className="px-3 py-2 bg-[#1B2430] rounded-r-md">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -214,8 +233,21 @@ export default function SellerDashboardPage() {
                   <td className="px-3 py-2.5 text-[#1B2430] font-medium">
                     {formatBDT(it.price * it.quantity)}
                   </td>
-                  <td className="px-3 py-2.5 text-[#1B2430]/50 rounded-r-md">
+                  <td className="px-3 py-2.5 text-[#1B2430]/50">
                     {it.createdAt?.slice(0, 10)}
+                  </td>
+                  <td className="px-3 py-2.5 rounded-r-md">
+                    <select
+                      value={it.status}
+                      onChange={(e) => handleStatusChange(it.orderId, e.target.value)}
+                      className={`text-xs font-medium rounded-full px-2 py-1 border-0 outline-none capitalize cursor-pointer ${STATUS_STYLES[it.status]}`}
+                    >
+                      {STATUS_OPTIONS.map((s) => (
+                        <option key={s} value={s} className="bg-white text-[#1B2430]">
+                          {s}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                 </tr>
               ))}

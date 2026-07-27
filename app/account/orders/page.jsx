@@ -12,6 +12,12 @@ function formatDate(iso) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
+const STATUS_STYLES = {
+  pending: "bg-[#C9962B]/15 text-[#C9962B]",
+  shipped: "bg-[#3B6EA5]/15 text-[#3B6EA5]",
+  delivered: "bg-[#6E7A52]/15 text-[#6E7A52]",
+};
+
 export default function MyOrdersPage() {
   const { user } = useSelector((state) => state.auth);
   const [orders, setOrders] = useState([]);
@@ -43,10 +49,19 @@ export default function MyOrdersPage() {
               key={order.id}
               className="bg-white rounded-xl border border-[#1B2430]/10 overflow-hidden"
             >
-              <div className="flex items-center justify-between px-4 sm:px-5 py-3 bg-[#F4F0E4] border-b border-[#1B2430]/10 gap-2">
-                <p className="text-xs sm:text-sm text-[#1B2430]/60">
-                  {formatDate(order.createdAt)}
-                </p>
+              <div className="flex items-center justify-between px-4 sm:px-5 py-3 bg-[#F4F0E4] border-b border-[#1B2430]/10 gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs sm:text-sm text-[#1B2430]/60">
+                    {formatDate(order.createdAt)}
+                  </p>
+                  <span
+                    className={`text-[10px] sm:text-xs font-medium capitalize px-2 py-0.5 rounded-full ${
+                      STATUS_STYLES[order.status || "pending"]
+                    }`}
+                  >
+                    {order.status || "pending"}
+                  </span>
+                </div>
                 <span className="text-xs sm:text-sm font-semibold text-white bg-[#6E7A52] px-3 py-1 rounded-full shrink-0">
                   {formatBDT(order.total)}
                 </span>
