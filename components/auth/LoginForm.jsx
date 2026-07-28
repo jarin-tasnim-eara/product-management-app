@@ -28,7 +28,9 @@ export default function LoginForm() {
 
       if (next === "cart") {
         router.push("/cart");
-      } else if (loggedInUser.role === ROLES.SELLER || loggedInUser.role === ROLES.ADMIN) {
+      } else if (loggedInUser.role === ROLES.ADMIN) {
+        router.push("/admin/dashboard");
+      } else if (loggedInUser.role === ROLES.SELLER) {
         router.push("/seller/dashboard");
       } else {
         router.push("/");

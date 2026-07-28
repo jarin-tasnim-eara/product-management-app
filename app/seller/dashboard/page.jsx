@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { orderService } from "@/services/orderService";
 import { productService } from "@/services/productService";
 import { formatBDT } from "@/lib/formatPrice";
-import { showError } from "@/lib/alerts";
+import { showError, showSuccess } from "@/lib/alerts";
 import { FaExclamationTriangle } from "react-icons/fa";
 import {
   BarChart,
@@ -74,11 +74,18 @@ export default function SellerDashboardPage() {
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
     try {
-      await orderService.updateOrderStatus(orderId, newStatus);
+      await orderService.updateOrderStatus(orderId, newStatus, user.email);
+      showSuccess("Status updated.");
+    } catch (err) {
+      showError("Could not update status. Please try again.");
+      return;
+    }
+
+    try {
       const freshProducts = await productService.getSellerProducts(user.email);
       setProducts(freshProducts);
     } catch (err) {
-      showError("Could not update status. Please try again.");
+      console.warn("Could not refresh products after status change:", err);
     }
   }
 
@@ -242,32 +249,32 @@ export default function SellerDashboardPage() {
         {recentOrders.length === 0 ? (
           <p className="text-sm text-[#1B2430]/40">No orders yet.</p>
         ) : (
-          <table className="w-full text-sm border-separate border-spacing-y-1">
+          <table className="w-full text-[11px] sm:text-sm border-separate border-spacing-y-1 table-fixed">
             <thead>
-              <tr className="text-left text-white text-xs uppercase tracking-wide">
-                <th className="px-3 py-2 bg-[#1B2430] rounded-l-md">Product</th>
-                <th className="px-3 py-2 bg-[#1B2430]">Qty</th>
-                <th className="px-3 py-2 bg-[#1B2430]">Total</th>
-                <th className="px-3 py-2 bg-[#1B2430]">Date</th>
-                <th className="px-3 py-2 bg-[#1B2430] rounded-r-md">Status</th>
+              <tr className="text-left text-white text-[10px] sm:text-xs uppercase tracking-wide">
+                <th className="px-2 sm:px-3 py-2 bg-[#1B2430] rounded-l-md w-[30%]">Product</th>
+                <th className="px-2 py-2 bg-[#1B2430] w-[10%]">Qty</th>
+                <th className="px-2 py-2 bg-[#1B2430] w-[20%]">Total</th>
+                <th className="px-2 py-2 bg-[#1B2430] w-[14%]">Date</th>
+                <th className="px-2 py-2 bg-[#1B2430] rounded-r-md w-[26%]">Status</th>
               </tr>
             </thead>
             <tbody>
               {recentOrders.map((it, i) => (
                 <tr key={i} className={i % 2 === 0 ? "bg-[#F4F0E4]/60" : ""}>
-                  <td className="px-3 py-2.5 text-[#1B2430] rounded-l-md">{it.name}</td>
-                  <td className="px-3 py-2.5 text-[#1B2430]/70">{it.quantity}</td>
-                  <td className="px-3 py-2.5 text-[#1B2430] font-medium">
+                  <td className="px-2 sm:px-3 py-2.5 text-[#1B2430] rounded-l-md break-words">{it.name}</td>
+                  <td className="px-2 py-2.5 text-[#1B2430]/70">{it.quantity}</td>
+                  <td className="px-2 py-2.5 text-[#1B2430] font-medium break-words">
                     {formatBDT(it.price * it.quantity)}
                   </td>
-                  <td className="px-3 py-2.5 text-[#1B2430]/50">
-                    {it.createdAt?.slice(0, 10)}
+                  <td className="px-2 py-2.5 text-[#1B2430]/50">
+                    {it.createdAt?.slice(5, 10)}
                   </td>
-                  <td className="px-3 py-2.5 rounded-r-md">
+                  <td className="px-2 py-2.5 rounded-r-md">
                     <select
                       value={it.status}
                       onChange={(e) => handleStatusChange(it.orderId, e.target.value)}
-                      className={`text-xs font-medium rounded-full px-2 py-1 border-0 outline-none capitalize cursor-pointer ${STATUS_STYLES[it.status]}`}
+                      className={`w-full text-[10px] sm:text-xs font-medium rounded-full px-1.5 py-1 border-0 outline-none capitalize cursor-pointer ${STATUS_STYLES[it.status]}`}
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s} className="bg-white text-[#1B2430]">

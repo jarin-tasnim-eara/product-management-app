@@ -7,7 +7,7 @@ import { ROLES } from "@/config/constants";
 export default function CreateProductButton() {
   const { user, role } = useSelector((state) => state.auth);
 
-  if (!user || (role !== ROLES.SELLER && role !== ROLES.ADMIN)) {
+  if (!user || role !== ROLES.SELLER) {
     return null;
   }
 

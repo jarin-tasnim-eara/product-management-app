@@ -1,6 +1,5 @@
 import { api } from "./api";
 import { db } from "@/lib/firebase";
-import { USD_TO_BDT } from "@/config/constants";
 import {
   collection,
   addDoc,
@@ -22,11 +21,12 @@ function mapDummyProduct(p) {
     name: p.title,
     data: {
       category: p.category,
-      price: Math.round(p.price * USD_TO_BDT),
+      price: p.price,
       brand: p.brand,
       rating: p.rating,
       image: p.thumbnail,
       description: p.description,
+      currency: "USD",
     },
   };
 }
@@ -123,11 +123,19 @@ export const productService = {
     return { success: true };
   },
 
-  
   async decrementStock(id, quantity) {
-    
     await updateDoc(doc(db, PRODUCTS_COLLECTION, id), {
       "data.stock": increment(-quantity),
     });
+  },
+
+  async getAllStoreProducts() {
+    try {
+      const snapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
+      return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (error) {
+      console.error("getAllStoreProducts error:", error);
+      return [];
+    }
   },
 };

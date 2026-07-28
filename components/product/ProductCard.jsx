@@ -7,11 +7,12 @@ import { FaStar, FaPen, FaTrash, FaCartPlus, FaHeart, FaRegHeart } from "react-i
 import { addItem } from "@/redux/slices/cartSlice";
 import { toggleWishlistItem } from "@/redux/slices/wishlistSlice";
 import { formatBDT } from "@/lib/formatPrice";
+import { ROLES } from "@/config/constants";
 
 export default function ProductCard({ product, showOwnerActions = false, onDelete }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { user } = useSelector((state) => state.auth);
+  const { user, role } = useSelector((state) => state.auth);
   const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const { id, name, data } = product;
@@ -60,7 +61,7 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
           </span>
         )}
 
-        {!showOwnerActions && (
+        {!showOwnerActions && role !== ROLES.ADMIN && (
           <button
             type="button"
             onClick={handleToggleWishlist}
@@ -122,8 +123,9 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
         </div>
       </div>
 
+      {/* Seller নিজের dashboard এ (showOwnerActions=true) Add to Cart দেখানো হয় না */}
       <div className="mt-4 flex gap-2">
-        {!showOwnerActions && (
+        {!showOwnerActions && role !== ROLES.ADMIN && (
           <button
             type="button"
             onClick={handleAddToCart}

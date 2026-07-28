@@ -22,11 +22,21 @@ export const orderService = {
       items,
       sellerEmails,
       total,
-      status: "pending", 
-      stockDeducted: false, 
+      status: "pending",
+      stockDeductedFor: [],
       createdAt: new Date().toISOString(),
     });
     return { id: docRef.id };
+  },
+
+  async getAllOrders() {
+    try {
+      const snapshot = await getDocs(collection(db, ORDERS_COLLECTION));
+      return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (error) {
+      console.error("orderService getAllOrders error:", error);
+      return [];
+    }
   },
 
   async getOrdersForSeller(sellerEmail) {
@@ -59,22 +69,28 @@ export const orderService = {
     }
   },
 
- 
-  async updateOrderStatus(orderId, status) {
+  async updateOrderStatus(orderId, status, sellerEmail) {
     const orderRef = doc(db, ORDERS_COLLECTION, orderId);
 
-    if (status === "delivered") {
+    if (status === "delivered" && sellerEmail) {
       const snap = await getDoc(orderRef);
       if (!snap.exists()) return;
       const order = snap.data();
+      const alreadyDeducted = order.stockDeductedFor || [];
 
-      if (!order.stockDeducted) {
-        await Promise.all(
-          (order.items || [])
-            .filter((it) => !String(it.productId).startsWith("dummy_"))
-            .map((it) => productService.decrementStock(it.productId, it.quantity))
+      if (!alreadyDeducted.includes(sellerEmail)) {
+        const myItems = (order.items || []).filter(
+          (it) => it.sellerEmail === sellerEmail && !String(it.productId).startsWith("dummy_")
         );
-        await updateDoc(orderRef, { status, stockDeducted: true });
+
+        await Promise.all(
+          myItems.map((it) => productService.decrementStock(it.productId, it.quantity))
+        );
+
+        await updateDoc(orderRef, {
+          status,
+          stockDeductedFor: [...alreadyDeducted, sellerEmail],
+        });
         return;
       }
     }

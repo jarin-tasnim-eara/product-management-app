@@ -8,11 +8,12 @@ import { addItem } from "@/redux/slices/cartSlice";
 import { toggleWishlistItem } from "@/redux/slices/wishlistSlice";
 import { authService } from "@/services/authService";
 import { formatBDT } from "@/lib/formatPrice";
+import { ROLES } from "@/config/constants";
 
 export default function ProductDetails({ product }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { user } = useSelector((state) => state.auth);
+  const { user, role } = useSelector((state) => state.auth);
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const [sellerProfile, setSellerProfile] = useState(null);
 
@@ -128,9 +129,11 @@ export default function ProductDetails({ product }) {
               <p className="text-sm text-[#1B2430]/70 mb-5">{description}</p>
             )}
 
-            {isOwnProduct ? (
+            {isOwnProduct || role === ROLES.ADMIN ? (
               <p className="text-sm text-[#1B2430]/50 italic mb-6">
-                This is your own listing.
+                {role === ROLES.ADMIN
+                  ? "Viewing as admin — purchasing is not available."
+                  : "This is your own listing."}
               </p>
             ) : (
               <div className="flex gap-3 mb-6">

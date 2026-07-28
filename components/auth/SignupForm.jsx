@@ -33,7 +33,9 @@ export default function SignupForm() {
 
       if (next === "cart") {
         router.push("/cart");
-      } else if (newUser.role === ROLES.SELLER || newUser.role === ROLES.ADMIN) {
+      } else if (newUser.role === ROLES.ADMIN) {
+        router.push("/admin/dashboard");
+      } else if (newUser.role === ROLES.SELLER) {
         router.push("/seller/dashboard");
       } else {
         router.push("/");

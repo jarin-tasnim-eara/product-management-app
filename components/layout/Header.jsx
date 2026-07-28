@@ -16,7 +16,9 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isDashboardArea =
-    pathname?.startsWith("/seller") || pathname?.startsWith("/account");
+    pathname?.startsWith("/seller") ||
+    pathname?.startsWith("/account") ||
+    pathname?.startsWith("/admin");
 
  
   function AccountMenu({ dashboardHref, dashboardLabel }) {
@@ -114,7 +116,10 @@ export default function Header() {
             <span className="text-sm text-white/50">Loading...</span>
           ) : user ? (
             role === ROLES.SELLER || role === ROLES.ADMIN ? (
-              <AccountMenu dashboardHref="/seller/dashboard" dashboardLabel="Seller Dashboard" />
+              <AccountMenu
+                dashboardHref={role === ROLES.ADMIN ? "/admin/dashboard" : "/seller/dashboard"}
+                dashboardLabel={role === ROLES.ADMIN ? "Admin Dashboard" : "Seller Dashboard"}
+              />
             ) : (
               <>
                 <Link

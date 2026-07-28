@@ -101,6 +101,16 @@ export const authService = {
     await setDoc(doc(db, "users", uid), updates, { merge: true });
   },
 
+  async getAllUsers() {
+    try {
+      const snapshot = await getDocs(collection(db, "users"));
+      return snapshot.docs.map((d) => ({ uid: d.id, ...d.data() }));
+    } catch (error) {
+      console.warn("getAllUsers error:", error);
+      return [];
+    }
+  },
+
   async getProfileByEmail(email) {
     if (!email) return null;
     try {
