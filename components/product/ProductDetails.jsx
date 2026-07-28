@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { FaStar, FaCartPlus, FaStore, FaArrowLeft } from "react-icons/fa";
+import { FaStar, FaCartPlus, FaStore, FaArrowLeft, FaHeart, FaRegHeart } from "react-icons/fa";
 import { addItem } from "@/redux/slices/cartSlice";
+import { toggleWishlistItem } from "@/redux/slices/wishlistSlice";
 import { authService } from "@/services/authService";
 import { formatBDT } from "@/lib/formatPrice";
 
@@ -12,6 +13,7 @@ export default function ProductDetails({ product }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const { user } = useSelector((state) => state.auth);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
   const [sellerProfile, setSellerProfile] = useState(null);
 
   const { name, data } = product;
@@ -48,6 +50,16 @@ export default function ProductDetails({ product }) {
     router.push("/cart");
   }
 
+  const isWishlisted = wishlistItems.some((i) => i.productId === product.id);
+
+  function handleToggleWishlist() {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    dispatch(toggleWishlistItem(product));
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <button
@@ -62,7 +74,6 @@ export default function ProductDetails({ product }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="w-full aspect-square rounded-lg overflow-hidden bg-[#F4F0E4] flex items-center justify-center">
             {image ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={image}
                 alt={name}
@@ -135,6 +146,17 @@ export default function ProductDetails({ product }) {
                   className="flex-1 px-4 py-2.5 bg-[#1B2430] text-white rounded-md text-sm font-medium hover:bg-[#6E7A52] transition-colors"
                 >
                   Buy Now
+                </button>
+                <button
+                  onClick={handleToggleWishlist}
+                  title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                  className="w-11 h-11 shrink-0 flex items-center justify-center rounded-md border border-[#1B2430]/15 hover:bg-[#F4F0E4] transition-colors"
+                >
+                  {isWishlisted ? (
+                    <FaHeart className="text-[#B5573F]" size={16} />
+                  ) : (
+                    <FaRegHeart className="text-[#1B2430]/50" size={16} />
+                  )}
                 </button>
               </div>
             )}

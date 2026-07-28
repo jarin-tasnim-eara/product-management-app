@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   FaHome,
   FaShoppingBag,
+  FaHeart,
   FaUser,
   FaCog,
   FaSignOutAlt,
@@ -16,6 +17,7 @@ import { authService } from "@/services/authService";
 
 const LINKS = [
   { href: "/account/orders", label: "My Orders", icon: FaShoppingBag },
+  { href: "/account/wishlist", label: "Wishlist", icon: FaHeart },
   { href: "/account/profile", label: "Profile", icon: FaUser },
   { href: "/account/settings", label: "Settings", icon: FaCog },
 ];

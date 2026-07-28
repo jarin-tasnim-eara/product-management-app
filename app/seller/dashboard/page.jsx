@@ -19,7 +19,7 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const PIE_COLORS = ["#6E7A52", "#94AC8D", "#B5573F", "#C9962B", "#1B2430"];
+const PIE_COLORS = ["#FF9800", "#8BC34A", "#D50000", "#FFD54F", "#00ACC1" , "#3F51B5"];
 
 const STATUS_OPTIONS = ["pending", "shipped", "delivered"];
 const STATUS_STYLES = {
@@ -29,9 +29,14 @@ const STATUS_STYLES = {
 };
 
 function stockColor(stock) {
-  if (stock < 10) return "#B5573F";
-  if (stock < 30) return "#C9962B";
-  return "#6E7A52";
+  if (stock < 10) return "#E53935";
+  if (stock < 20) return "#FB8C00";
+   if (stock < 30) return "#FDD835";
+  if (stock < 40) return "#43A047";
+    if (stock < 50) return "#3F51B5";
+
+  
+  return "#00E676";
 }
 
 export default function SellerDashboardPage() {
@@ -138,7 +143,7 @@ export default function SellerDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-xl border border-[#1B2430]/10 p-5">
           <p className="text-sm font-semibold text-[#1B2430] mb-4">
-            <span className="inline-block w-2 h-2 rounded-full bg-[#6E7A52] mr-2" />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#F48FB1] mr-2" />
             Sales — Last 7 Days
           </p>
           <ResponsiveContainer width="100%" height={220}>
@@ -150,7 +155,7 @@ export default function SellerDashboardPage() {
                 formatter={(v) => formatBDT(v)}
                 contentStyle={{ borderRadius: 8, border: "1px solid #1B243020" }}
               />
-              <Bar dataKey="sales" fill="#6E7A52" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="sales" fill="#F48FB1" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

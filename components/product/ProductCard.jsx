@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { FaStar, FaPen, FaTrash, FaCartPlus } from "react-icons/fa";
+import { FaStar, FaPen, FaTrash, FaCartPlus, FaHeart, FaRegHeart } from "react-icons/fa";
 import { addItem } from "@/redux/slices/cartSlice";
+import { toggleWishlistItem } from "@/redux/slices/wishlistSlice";
 import { formatBDT } from "@/lib/formatPrice";
 
 export default function ProductCard({ product, showOwnerActions = false, onDelete }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const { user } = useSelector((state) => state.auth);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const { id, name, data } = product;
   const price = data?.price;
@@ -25,6 +27,16 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
       return;
     }
     dispatch(addItem(product));
+  }
+
+  const isWishlisted = wishlistItems.some((i) => i.productId === id);
+
+  function handleToggleWishlist() {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    dispatch(toggleWishlistItem(product));
   }
 
   return (
@@ -46,6 +58,21 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
           <span className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide text-[#1B2430]/60 capitalize">
             {category}
           </span>
+        )}
+
+        {!showOwnerActions && (
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur hover:bg-white transition"
+          >
+            {isWishlisted ? (
+              <FaHeart className="text-[#B5573F]" size={14} />
+            ) : (
+              <FaRegHeart className="text-[#1B2430]/50" size={14} />
+            )}
+          </button>
         )}
 
         {showOwnerActions && (
@@ -108,7 +135,7 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
         )}
         <Link
           href={`/products/${id}`}
-          className={`text-center bg-[#393748] px-3 py-2 border border-[#1B2430]/20 text-white rounded-md text-sm hover:border-[#6E7A52] hover:text-[#6E7A52] transition-colors ${
+          className={`text-center px-3 py-2 border bg-[#393748] border-[#1B2430]/20 text-white rounded-md text-sm hover:border-[#6E7A52] hover:text-[#6E7A52] transition-colors ${
             showOwnerActions ? "w-full" : "flex-1"
           }`}
         >

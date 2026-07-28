@@ -4,10 +4,12 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 
 function AppListeners({ children }) {
   useAuth();
   useCart();
+  useWishlist();
   return children;
 }
 
