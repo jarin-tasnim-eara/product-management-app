@@ -15,14 +15,14 @@ const ORDERS_COLLECTION = "orders";
 
 export const orderService = {
   async createOrder(buyerEmail, items, total) {
+    const itemsWithStatus = items.map((it) => ({ ...it, status: "pending" }));
     const sellerEmails = [...new Set(items.map((i) => i.sellerEmail).filter(Boolean))];
 
     const docRef = await addDoc(collection(db, ORDERS_COLLECTION), {
       buyerEmail,
-      items,
+      items: itemsWithStatus,
       sellerEmails,
       total,
-      status: "pending",
       stockDeductedFor: [],
       createdAt: new Date().toISOString(),
     });
@@ -69,32 +69,29 @@ export const orderService = {
     }
   },
 
-  async updateOrderStatus(orderId, status, sellerEmail) {
+  async updateOrderStatus(orderId, newStatus, sellerEmail) {
     const orderRef = doc(db, ORDERS_COLLECTION, orderId);
+    const snap = await getDoc(orderRef);
+    if (!snap.exists()) return;
+    const order = snap.data();
 
-    if (status === "delivered" && sellerEmail) {
-      const snap = await getDoc(orderRef);
-      if (!snap.exists()) return;
-      const order = snap.data();
-      const alreadyDeducted = order.stockDeductedFor || [];
+    const updatedItems = (order.items || []).map((it) =>
+      it.sellerEmail === sellerEmail ? { ...it, status: newStatus } : it
+    );
 
-      if (!alreadyDeducted.includes(sellerEmail)) {
-        const myItems = (order.items || []).filter(
-          (it) => it.sellerEmail === sellerEmail && !String(it.productId).startsWith("dummy_")
-        );
+    const alreadyDeducted = order.stockDeductedFor || [];
+    let newStockDeductedFor = alreadyDeducted;
 
-        await Promise.all(
-          myItems.map((it) => productService.decrementStock(it.productId, it.quantity))
-        );
-
-        await updateDoc(orderRef, {
-          status,
-          stockDeductedFor: [...alreadyDeducted, sellerEmail],
-        });
-        return;
-      }
+    if (newStatus === "delivered" && !alreadyDeducted.includes(sellerEmail)) {
+      const myItems = updatedItems.filter(
+        (it) => it.sellerEmail === sellerEmail && !String(it.productId).startsWith("dummy_")
+      );
+      await Promise.all(
+        myItems.map((it) => productService.decrementStock(it.productId, it.quantity))
+      );
+      newStockDeductedFor = [...alreadyDeducted, sellerEmail];
     }
 
-    await updateDoc(orderRef, { status });
+    await updateDoc(orderRef, { items: updatedItems, stockDeductedFor: newStockDeductedFor });
   },
 };

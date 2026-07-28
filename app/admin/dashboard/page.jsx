@@ -24,7 +24,23 @@ const STATUS_STYLES = {
   pending: "bg-[#C9962B]/15 text-[#C9962B]",
   shipped: "bg-[#3B6EA5]/15 text-[#3B6EA5]",
   delivered: "bg-[#6E7A52]/15 text-[#6E7A52]",
+  partial: "bg-[#8E44AD]/15 text-[#8E44AD]",
 };
+
+const STATUS_LABELS = {
+  pending: "Pending",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  partial: "Partial",
+};
+
+function aggregateStatus(items) {
+  const statuses = (items || []).map((it) => it.status || "pending");
+  if (statuses.every((s) => s === "delivered")) return "delivered";
+  if (statuses.some((s) => s === "delivered")) return "partial";
+  if (statuses.some((s) => s === "shipped")) return "shipped";
+  return "pending";
+}
 
 export default function AdminDashboardPage() {
   const [orders, setOrders] = useState([]);
@@ -182,11 +198,11 @@ export default function AdminDashboardPage() {
                   </td>
                   <td className="px-2 py-2.5 rounded-r-md">
                     <span
-                      className={`text-[10px] sm:text-xs font-medium rounded-full px-1.5 py-1 capitalize ${
-                        STATUS_STYLES[o.status || "pending"]
+                      className={`text-[10px] sm:text-xs font-medium rounded-full px-1.5 py-1 ${
+                        STATUS_STYLES[aggregateStatus(o.items)]
                       }`}
                     >
-                      {o.status || "pending"}
+                      {STATUS_LABELS[aggregateStatus(o.items)]}
                     </span>
                   </td>
                 </tr>

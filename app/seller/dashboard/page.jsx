@@ -66,7 +66,7 @@ export default function SellerDashboardPage() {
   const myItems = orders.flatMap((o) =>
     (o.items || [])
       .filter((it) => it.sellerEmail === user.email)
-      .map((it) => ({ ...it, orderId: o.id, createdAt: o.createdAt, status: o.status || "pending" }))
+      .map((it) => ({ ...it, orderId: o.id, createdAt: o.createdAt, status: it.status || "pending" }))
   );
 
   async function handleStatusChange(orderId, newStatus) {
