@@ -6,6 +6,7 @@ import { orderService } from "@/services/orderService";
 import { productService } from "@/services/productService";
 import { formatBDT } from "@/lib/formatPrice";
 import { showError } from "@/lib/alerts";
+import { FaExclamationTriangle } from "react-icons/fa";
 import {
   BarChart,
   Bar,
@@ -19,7 +20,7 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const PIE_COLORS = ["#FF9800", "#8BC34A", "#D50000", "#FFD54F", "#00ACC1" , "#3F51B5"];
+const PIE_COLORS = ["#FF9800", "#8BC34A", "#D50000", "#FFD54F", "#00ACC1", "#3F51B5"];
 
 const STATUS_OPTIONS = ["pending", "shipped", "delivered"];
 const STATUS_STYLES = {
@@ -28,14 +29,15 @@ const STATUS_STYLES = {
   delivered: "bg-[#6E7A52]/15 text-[#6E7A52]",
 };
 
+const LOW_STOCK_THRESHOLD = 10;
+
 function stockColor(stock) {
   if (stock < 10) return "#E53935";
   if (stock < 20) return "#FB8C00";
-   if (stock < 30) return "#FDD835";
+  if (stock < 30) return "#FDD835";
   if (stock < 40) return "#43A047";
-    if (stock < 50) return "#3F51B5";
+  if (stock < 50) return "#3F51B5";
 
-  
   return "#00E676";
 }
 
@@ -73,6 +75,8 @@ export default function SellerDashboardPage() {
     );
     try {
       await orderService.updateOrderStatus(orderId, newStatus);
+      const freshProducts = await productService.getSellerProducts(user.email);
+      setProducts(freshProducts);
     } catch (err) {
       showError("Could not update status. Please try again.");
     }
@@ -83,6 +87,10 @@ export default function SellerDashboardPage() {
   const totalStock = products.reduce(
     (sum, p) => sum + (Number(p.data?.stock) || 0),
     0
+  );
+
+  const lowStockProducts = products.filter(
+    (p) => (Number(p.data?.stock) || 0) < LOW_STOCK_THRESHOLD
   );
 
   const last7Days = [...Array(7)].map((_, i) => {
@@ -122,6 +130,20 @@ export default function SellerDashboardPage() {
         Overview
       </p>
       <h1 className="text-2xl font-bold text-[#1B2430] mb-6">Dashboard</h1>
+
+      {lowStockProducts.length > 0 && (
+        <div className="flex items-start gap-3 bg-[#E53935]/10 border border-[#E53935]/30 rounded-xl p-4 mb-6">
+          <FaExclamationTriangle className="text-[#E53935] mt-0.5 shrink-0" size={16} />
+          <div>
+            <p className="text-sm font-semibold text-[#E53935] mb-1">
+              {lowStockProducts.length} product{lowStockProducts.length > 1 ? "s are" : " is"} running low on stock
+            </p>
+            <p className="text-xs text-[#1B2430]/70">
+              {lowStockProducts.map((p) => `${p.name} (${p.data?.stock ?? 0})`).join(", ")}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-[#1B2430]/10 p-5 border-l-4 border-l-[#6E7A52]">
@@ -195,7 +217,7 @@ export default function SellerDashboardPage() {
           <span className="inline-block w-2 h-2 rounded-full bg-[#C9962B] mr-2" />
           Stock Levels
         </p>
-       
+
         {stockData.length === 0 ? (
           <p className="text-sm text-[#1B2430]/40">No products yet.</p>
         ) : (
