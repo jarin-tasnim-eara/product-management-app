@@ -20,7 +20,6 @@ export default function Header() {
     pathname?.startsWith("/account") ||
     pathname?.startsWith("/admin");
 
- 
   function AccountMenu({ dashboardHref, dashboardLabel }) {
     return (
       <div className="relative">
@@ -75,7 +74,7 @@ export default function Header() {
               >
                 <FaShoppingCart size={18} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#6E7A52] text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
@@ -128,7 +127,7 @@ export default function Header() {
                 >
                   <FaShoppingCart size={18} />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#6E7A52] text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}

@@ -71,7 +71,16 @@ export default function SellerDashboardPage() {
 
   async function handleStatusChange(orderId, newStatus) {
     setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      prev.map((o) =>
+        o.id === orderId
+          ? {
+              ...o,
+              items: (o.items || []).map((it) =>
+                it.sellerEmail === user.email ? { ...it, status: newStatus } : it
+              ),
+            }
+          : o
+      )
     );
     try {
       await orderService.updateOrderStatus(orderId, newStatus, user.email);

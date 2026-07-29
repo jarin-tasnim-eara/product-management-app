@@ -21,12 +21,15 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
   const brand = data?.brand;
   const rating = data?.rating;
   const image = data?.image;
+  const stock = data?.stock;
+  const isOutOfStock = stock !== undefined && Number(stock) <= 0;
 
   function handleAddToCart() {
     if (!user) {
       router.push("/login?next=cart");
       return;
     }
+    if (isOutOfStock) return;
     dispatch(addItem(product));
   }
 
@@ -59,6 +62,14 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
           <span className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide text-[#1B2430]/60 capitalize">
             {category}
           </span>
+        )}
+
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <span className="bg-[#B5573F] text-white text-xs font-semibold px-3 py-1 rounded-full">
+              Out of Stock
+            </span>
+          </div>
         )}
 
         {!showOwnerActions && role !== ROLES.ADMIN && (
@@ -123,17 +134,26 @@ export default function ProductCard({ product, showOwnerActions = false, onDelet
         </div>
       </div>
 
-      {/* Seller নিজের dashboard এ (showOwnerActions=true) Add to Cart দেখানো হয় না */}
       <div className="mt-4 flex gap-2">
         {!showOwnerActions && role !== ROLES.ADMIN && (
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#6E7A52] text-white rounded-md text-sm hover:bg-[#5a6443] transition-colors"
-          >
-            <FaCartPlus size={13} />
-            Add
-          </button>
+          isOutOfStock ? (
+            <button
+              type="button"
+              disabled
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1B2430]/10 text-[#1B2430]/40 rounded-md text-sm cursor-not-allowed"
+            >
+              Out of Stock
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#6E7A52] text-white rounded-md text-sm hover:bg-[#5a6443] transition-colors"
+            >
+              <FaCartPlus size={13} />
+              Add
+            </button>
+          )
         )}
         <Link
           href={`/products/${id}`}

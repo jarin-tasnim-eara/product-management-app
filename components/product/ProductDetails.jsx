@@ -22,6 +22,8 @@ export default function ProductDetails({ product }) {
     data || {};
 
   const isOwnProduct = user?.email && sellerEmail && user.email === sellerEmail;
+  const stock = data?.stock;
+  const isOutOfStock = stock !== undefined && Number(stock) <= 0;
 
   const otherEntries = Object.entries(rest).filter(
     ([, value]) => value !== undefined && value !== null && value !== ""
@@ -39,6 +41,7 @@ export default function ProductDetails({ product }) {
       router.push("/login?next=cart");
       return;
     }
+    if (isOutOfStock) return;
     dispatch(addItem(product));
   }
 
@@ -47,6 +50,7 @@ export default function ProductDetails({ product }) {
       router.push("/login?next=cart");
       return;
     }
+    if (isOutOfStock) return;
     dispatch(addItem(product));
     router.push("/cart");
   }
@@ -135,6 +139,26 @@ export default function ProductDetails({ product }) {
                   ? "Viewing as admin — purchasing is not available."
                   : "This is your own listing."}
               </p>
+            ) : isOutOfStock ? (
+              <div className="flex gap-3 mb-6">
+                <button
+                  disabled
+                  className="flex-1 px-4 py-2.5 bg-[#1B2430]/10 text-[#1B2430]/40 rounded-md text-sm font-medium cursor-not-allowed"
+                >
+                  Out of Stock
+                </button>
+                <button
+                  onClick={handleToggleWishlist}
+                  title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                  className="w-11 h-11 shrink-0 flex items-center justify-center rounded-md border border-[#1B2430]/15 hover:bg-[#F4F0E4] transition-colors"
+                >
+                  {isWishlisted ? (
+                    <FaHeart className="text-[#B5573F]" size={16} />
+                  ) : (
+                    <FaRegHeart className="text-[#1B2430]/50" size={16} />
+                  )}
+                </button>
+              </div>
             ) : (
               <div className="flex gap-3 mb-6">
                 <button

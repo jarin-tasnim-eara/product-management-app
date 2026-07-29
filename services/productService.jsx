@@ -10,7 +10,6 @@ import {
   deleteDoc,
   query,
   where,
-  increment,
 } from "firebase/firestore";
 
 const PRODUCTS_COLLECTION = "products";
@@ -124,9 +123,12 @@ export const productService = {
   },
 
   async decrementStock(id, quantity) {
-    await updateDoc(doc(db, PRODUCTS_COLLECTION, id), {
-      "data.stock": increment(-quantity),
-    });
+    const productRef = doc(db, PRODUCTS_COLLECTION, id);
+    const snap = await getDoc(productRef);
+    if (!snap.exists()) return;
+    const currentStock = Number(snap.data()?.data?.stock) || 0;
+    const newStock = Math.max(0, currentStock - quantity);
+    await updateDoc(productRef, { "data.stock": newStock });
   },
 
   async getAllStoreProducts() {
