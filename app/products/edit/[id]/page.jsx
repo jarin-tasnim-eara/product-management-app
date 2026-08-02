@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { productService } from "@/services/productService";
 import EditProductForm from "@/components/product/EditProductForm";
 import ErrorState from "@/components/ui/ErrorState";

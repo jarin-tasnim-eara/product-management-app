@@ -3,6 +3,8 @@ import ErrorState from "@/components/ui/ErrorState";
 import Hero from "@/components/layout/Hero";
 import ProductListing from "@/components/product/ProductListing";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   let products = [];
   let error = null;

@@ -1,25 +1,27 @@
+export const dynamic = "force-dynamic";
 
-import {productService} from "@/services/productService";
+import { productService } from "@/services/productService";
 import ProductDetails from "@/components/product/ProductDetails";
 import ErrorState from "@/components/ui/ErrorState";
 
-export default async function ProductDetailsPage({params}){
-  const {id} = await params;
+export default async function ProductDetailsPage({ params }) {
+  const { id } = await params;
 
-  let product= null;
-  let error= null;
+  let product = null;
+  let error = null;
 
-  try{
+  try {
     product = await productService.getById(id);
-  }catch (err){
+    if (!product) error = "Product not found.";
+  } catch (err) {
     error = "Product not found.";
   }
 
-  return(
+  return (
     <main className="max-w-7xl mx-auto px-6 py-10">
-      {error ?(
+      {error ? (
         <ErrorState message={error} />
-      ):(
+      ) : (
         <ProductDetails product={product} />
       )}
     </main>
